@@ -1,5 +1,7 @@
 const base = 'http://localhost:4400';
-const seen = new Map(), queue = ['/'], problems = [], assets = new Set();
+const START = process.env.START ?? '/'; // set START=/<repo>/ when checking a build with a base path
+const P = START.replace(/\/$/, '');
+const seen = new Map(), queue = [START], problems = [], assets = new Set();
 const pageIds = new Map();
 while (queue.length) {
   const path = queue.shift();
@@ -17,7 +19,7 @@ while (queue.length) {
   if ((html.match(/<h1[ >]/g) || []).length !== 1) problems.push(`h1 count != 1 on ${path}`);
   for (const m of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
     const u = m[1];
-    if (/^(mailto:|https?:|data:|tel:)/.test(u)) { if (u.startsWith('http') && !u.includes('hasti-alitab.github.io') && !/localhost/.test(u)) assets.add('EXTERNAL ' + u); continue; }
+    if (/^(mailto:|https?:|data:|tel:)/.test(u)) { if (u.startsWith('http') && !/localhost/.test(u)) assets.add('EXTERNAL ' + u); continue; }
     if (u.startsWith('#')) { if (!ids.includes(u.slice(1))) problems.push(`bad fragment ${u} on ${path}`); continue; }
     if (!u.startsWith('/')) { problems.push(`relative url ${u} on ${path}`); continue; }
     const [p, frag] = u.split('#');
@@ -34,5 +36,6 @@ for (const a of assets) {
 console.log('pages crawled:', [...seen.keys()].length, [...seen.keys()].join(' '));
 console.log('assets checked:', [...assets].filter(a=>!a.startsWith('EXTERNAL')&&!a.startsWith('FRAG')).length);
 console.log(problems.length ? 'PROBLEMS:\n' + problems.join('\n') : 'No problems found');
-const sm = await (await fetch(base + '/sitemap-0.xml')).text(); console.log('sitemap urls:', (sm.match(/<loc>/g) || []).length);
-console.log('robots:', (await fetch(base + '/robots.txt')).status, 'favicon:', (await fetch(base + '/favicon.svg')).status, 'cv pdf:', (await fetch(base + '/downloads/Hasti-Alitab-Academic-CV.pdf')).status, '404 page:', (await fetch(base + '/nope/')).status);
+const sm = await (await fetch(base + P + '/sitemap-0.xml')).text(); console.log('sitemap urls:', (sm.match(/<loc>/g) || []).length);
+console.log('robots:', (await fetch(base + P + '/robots.txt')).status, 'favicon:', (await fetch(base + P + '/favicon.svg')).status, 'cv pdf:', (await fetch(base + P + '/downloads/Hasti-Alitab-Academic-CV.pdf')).status, '404 page:', (await fetch(base + P + '/nope/')).status);
+

@@ -72,11 +72,18 @@ Or replace it with a designed public CV of your own using the same filename.
 
 ## Deployment (GitHub Pages)
 
-1. Create the repository `hasti-alitab.github.io` and push this project to its `main` branch.
+1. Push this project to the `main` branch of the GitHub repository.
 2. In **Settings → Pages**, set **Source** to **GitHub Actions**.
 3. Each push to `main` runs `.github/workflows/deploy.yml` (build, then deploy).
 
-`astro.config.mjs` uses `site: 'https://hasti-alitab.github.io'` and no `base`, correct for a user site. For a project repository, set `base: '/<repo>'`; internal links already go through `url()` in `src/lib/url.ts`. For a custom domain, change `site`, add `public/CNAME`, and update the Sitemap line in `public/robots.txt`.
+`astro.config.mjs` derives `site` and `base` from the repository during CI (`GITHUB_REPOSITORY`):
+
+- repo `hastialitab/hasti-alitab.github.io` (current) is a *project site*, served at `https://hastialitab.github.io/hasti-alitab.github.io/`;
+- to get the shorter `https://hastialitab.github.io/`, rename the repo to `hastialitab.github.io` (Settings → General → Repository name) and re-run the workflow; no code change is needed.
+
+Internal links and assets go through `url()` in `src/lib/url.ts`, and `robots.txt` is generated, so both layouts work. For a custom domain, set `SITE_URL` and `BASE_PATH=/` in the workflow's build step and add `public/CNAME`.
+
+To test a base-path build locally: `GITHUB_REPOSITORY=hastialitab/hasti-alitab.github.io npm run build`, then serve `dist/` under that prefix (`astro preview` ignores the base path).
 
 > The project folder currently sits inside a git repository rooted at the Windows user directory. Run `git init` inside this folder (or copy it elsewhere) before pushing.
 

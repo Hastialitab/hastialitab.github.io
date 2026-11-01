@@ -9,3 +9,7 @@ public/images/**/*-400.webp
 public/images/**/*-800.webp
 public/images/**/*-1200.webp
 public/images/**/*-640.webp
+
+# private source material (the CV contains DOB and phone) and local tooling
+references/
+.claude/
