@@ -1,0 +1,27 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+---
+<PageLayout title="Contact" description="Contact Hasti Alitab for academic collaboration, research opportunities or further information." intro="Get in touch for academic collaboration, research opportunities, or further information." seed={0}>
+  <section class="section">
+    <div class="container two-col">
+      <div>
+        <p class="lead">I am an archaeologist and MA researcher in Landscape Archaeology. I welcome enquiries about research collaboration, supervision and doctoral opportunities, and academic projects.</p>
+        <p><a class="btn btn--primary" href={`mailto:${site.email}?subject=Academic%20enquiry`}><Icon name="mail" /> Email Hasti</a></p>
+      </div>
+      <dl class="meta-list">
+        <dt>Email</dt><dd><a href={`mailto:${site.email}`}>{site.email}</a></dd>
+        <dt>Based in</dt><dd>{site.location}</dd>
+        <dt>Profiles</dt>
+        <dd>
+          {site.profiles.length ? (
+            <ul>{site.profiles.map((p) => <li><a href={p.href} rel="me noopener">{p.label}</a></li>)}</ul>
+          ) : (
+            <span class="muted">Academic profile links (ORCID, Google Scholar, Academia.edu) to be added.</span>
+          )}
+        </dd>
+      </dl>
+    </div>
+  </section>
+</PageLayout>

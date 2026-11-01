@@ -1,0 +1,21 @@
+---
+// Consistent placeholder for imagery that is not yet available.
+// Draws abstract terrain bands — clearly illustrative, never a photograph.
+interface Props { label: string; ratio?: string; tone?: 'sand' | 'olive' | 'slate'; seed?: number }
+const { label, ratio = '4 / 3', tone = 'sand', seed = 0 } = Astro.props;
+const bg = { sand: '#d8cdb6', olive: '#7d8870', slate: '#3b5150' }[tone];
+const ridge = { sand: '#b9a88d', olive: '#68745c', slate: '#293c3b' }[tone];
+const ridge2 = { sand: '#8b765b', olive: '#55604a', slate: '#1f2f2e' }[tone];
+const s = seed * 25;
+---
+<div class="ph" style={`--ratio:${ratio};background:${bg}`} role="img" aria-label={`Placeholder: ${label}`}>
+  <svg class="ph__art" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <path d={`M0 ${170 + s % 40} C 80 ${120 - s % 30}, 150 ${190}, 230 ${130 + s % 20} S 360 ${110}, 400 ${150} V300 H0Z`} fill={ridge} opacity="0.55" />
+    <path d={`M0 ${215} C 90 ${180 + s % 30}, 170 ${240}, 260 ${200 - s % 20} S 360 ${190}, 400 ${220} V300 H0Z`} fill={ridge2} opacity="0.6" />
+    <g fill="none" stroke="#f8f6f0" stroke-opacity="0.35">
+      <path d="M0 250 C 100 230, 200 270, 400 240" />
+      <path d="M0 270 C 120 250, 220 285, 400 262" />
+    </g>
+  </svg>
+  <span class="ph__label">{label}</span>
+</div>

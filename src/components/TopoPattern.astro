@@ -1,0 +1,15 @@
+---
+// Decorative topographic contour lines (pure SVG, no assets). Inherits `currentColor`.
+interface Props { class?: string; seed?: number }
+const { class: cls = '', seed = 0 } = Astro.props;
+const rings = Array.from({ length: 11 }, (_, i) => i);
+const cx = 300 + seed * 40;
+const cy = 200 - seed * 20;
+---
+<svg class={`topo ${cls}`} viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+  <g fill="none" stroke="currentColor" stroke-width="1">
+    {rings.map((i) => (
+      <path d={`M ${cx - 40 - i * 34} ${cy} C ${cx - 40 - i * 34} ${cy - 50 - i * 22}, ${cx + 120 + i * 30} ${cy - 90 - i * 18}, ${cx + 160 + i * 36} ${cy - 10} S ${cx + 90 + i * 26} ${cy + 80 + i * 20}, ${cx - 10} ${cy + 70 + i * 18} S ${cx - 40 - i * 34} ${cy + 40}, ${cx - 40 - i * 34} ${cy} Z`} />
+    ))}
+  </g>
+</svg>

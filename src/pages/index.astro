@@ -1,0 +1,109 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import ResearchCard from '../components/ResearchCard.astro';
+import PublicationCard from '../components/PublicationCard.astro';
+import InteractiveMap from '../components/InteractiveMap.astro';
+import Icon from '../components/Icon.astro';
+import TopoPattern from '../components/TopoPattern.astro';
+import { researchThemes } from '../data/research';
+import { publications } from '../data/publications';
+import { courses } from '../data/teaching';
+import { site } from '../data/site';
+import { url } from '../lib/url';
+
+const fieldwork = (await getCollection('fieldwork')).sort((a, b) => a.data.order - b.data.order);
+const sites = fieldwork
+  .filter((f) => f.data.coordinates)
+  .map((f) => ({ slug: f.id, site: f.data.site, location: f.data.location, region: f.data.region, year: f.data.year, lat: f.data.coordinates!.lat, lng: f.data.coordinates!.lng }));
+const interests = [
+  { icon: 'mountain', label: 'Landscape Archaeology' },
+  { icon: 'layers', label: 'GIS & Remote Sensing' },
+  { icon: 'waves', label: 'Geoarchaeology & Hydrology' },
+  { icon: 'users', label: 'Human–Environment Interactions' },
+] as const;
+---
+<BaseLayout>
+  <Hero />
+
+  <section class="section">
+    <div class="container two-col">
+      <div>
+        <p class="eyebrow">Academic profile</p>
+        <h2>Research at the Intersection of People, Environment, and Place</h2>
+        <p class="lead">
+          I am an archaeologist and MA researcher in Landscape Archaeology. I study archaeological landscapes to understand how past societies interacted with their environments, using archaeological, geomorphological, hydrological and remote-sensing data.
+        </p>
+        <p>The landscape is not just the background of archaeology; it is part of the archaeological evidence itself.</p>
+        <a class="text-link" href={url('/about/')}>About me <Icon name="arrowRight" /></a>
+      </div>
+      <ul class="interest-list" aria-label="Research interests">
+        {interests.map((i) => <li><Icon name={i.icon} /> {i.label}</li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--tint">
+    <div class="container">
+      <SectionHeading eyebrow="Research themes" title="Research Interests" lead="Current interests, grounded in my MA research and documented training." />
+      <div class="grid grid--3">
+        {researchThemes.map((t, i) => <ResearchCard theme={t} index={i} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section atlas-preview">
+    <TopoPattern class="atlas-preview__topo" seed={2} />
+    <div class="container">
+      <SectionHeading eyebrow="Fieldwork Atlas" title="A spatial overview of my fieldwork across Iran" lead="Six documented archaeological and geophysical missions, 2022–2024." />
+      <InteractiveMap sites={sites} height="28rem" id="home-atlas" />
+      <p style="margin-top:var(--space-6)"><a class="btn btn--primary" href={url('/fieldwork/atlas/')}>Explore the Interactive Map <Icon name="arrowRight" /></a></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeading eyebrow="Publications" title="Selected Publications" />
+      <PublicationCard pub={publications[0]} compact />
+      <p style="margin-top:var(--space-6)"><a class="text-link" href={url('/publications/')}>All publications <Icon name="arrowRight" /></a></p>
+    </div>
+  </section>
+
+  <section class="section section--tint">
+    <div class="container two-col two-col--even">
+      <div>
+        <SectionHeading eyebrow="Academic activities" title="Teaching" level="h2" />
+        <p>Teaching Assistant, Department of Archaeology, Shahid Beheshti University (2024–present).</p>
+        <ul>{courses.map((c) => <li>{c.title}</li>)}</ul>
+        <a class="text-link" href={url('/teaching/')}>Teaching in detail <Icon name="arrowRight" /></a>
+      </div>
+      <div>
+        <SectionHeading eyebrow="Training" title="Spatial &amp; scientific methods" />
+        <p>Several years of coursework and workshops in remote sensing, GIS, geomorphology, hydrology and the digital processing of satellite images.</p>
+        <a class="text-link" href={url('/cv/')}>Academic CV <Icon name="arrowRight" /></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container contact-invite">
+      <h2>Collaboration and enquiries</h2>
+      <p class="lead">I welcome contact from supervisors, research groups and colleagues working on landscape archaeology, spatial analysis and the archaeology of Iran.</p>
+      <a class="btn btn--primary" href={`mailto:${site.email}`}><Icon name="mail" /> {site.email}</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .interest-list { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--line-strong); padding-left: var(--space-8); display: grid; gap: var(--space-4); align-content: center; font-family: var(--font-display); font-size: 1.15rem; }
+  .interest-list li { display: flex; align-items: center; gap: var(--space-4); }
+  .interest-list :global(.icon) { width: 1.6rem; height: 1.6rem; color: var(--earth); }
+  @media (max-width: 52rem) { .interest-list { border-left: 0; padding-left: 0; border-top: 1px solid var(--line-strong); padding-top: var(--space-6); } }
+  .atlas-preview { position: relative; overflow: hidden; }
+  .atlas-preview :global(.atlas-preview__topo) { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--sand); opacity: 0.35; pointer-events: none; }
+  .atlas-preview .container { position: relative; }
+  .contact-invite { text-align: center; }
+  .contact-invite .lead { margin-inline: auto; margin-bottom: var(--space-6); }
+</style>

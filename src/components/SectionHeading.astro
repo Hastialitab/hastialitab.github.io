@@ -1,0 +1,16 @@
+---
+interface Props { eyebrow?: string; title: string; level?: 'h2' | 'h3'; lead?: string }
+const { eyebrow, title, level = 'h2', lead } = Astro.props;
+const Tag = level;
+---
+<div class="section-heading">
+  {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+  <Tag>{title}</Tag>
+  {lead && <p class="lead">{lead}</p>}
+</div>
+
+<style>
+  .section-heading { margin-bottom: var(--space-8); }
+  .section-heading :global(h2), .section-heading :global(h3) { margin-bottom: var(--space-3); }
+  .lead { color: var(--slate); margin: 0; }
+</style>

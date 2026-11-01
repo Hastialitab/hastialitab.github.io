@@ -1,0 +1,41 @@
+---
+import ImagePlaceholder from './ImagePlaceholder.astro';
+import Picture from './Picture.astro';
+import type { Publication } from '../data/publications';
+interface Props { pub: Publication; compact?: boolean }
+const { pub, compact = false } = Astro.props;
+---
+<article class:list={['pub', { 'pub--compact': compact }]}>
+  <div class="pub__cover">
+    {pub.cover ? (
+      <figure>
+        <Picture src={pub.cover} alt={pub.coverAlt ?? ''} width={904} height={1083} widths={[400, 640]} sizes="(min-width: 40rem) 16rem, 70vw" />
+        {pub.coverCredit && <figcaption>{pub.coverCredit}</figcaption>}
+      </figure>
+    ) : (
+      <ImagePlaceholder label="Cover pending" ratio="3 / 4" tone="olive" />
+    )}
+  </div>
+  <div class="pub__text">
+    <p class="data-label">{pub.type} · {pub.year}</p>
+    <h3>{pub.title}</h3>
+    {pub.subtitle && <p class="pub__subtitle">{pub.subtitle}</p>}
+    <dl class="meta-list">
+      <dt>Authors</dt><dd>{pub.authors}</dd>
+      <dt>Publisher</dt><dd>{pub.publisher}, {pub.place}</dd>
+      {pub.pages && <><dt>Extent</dt><dd>{pub.pages}</dd></>}
+      {pub.isbn && <><dt>ISBN</dt><dd class="data-label" style="font-size:0.95rem;color:inherit">{pub.isbn}</dd></>}
+      <dt>Language</dt><dd>{pub.language}</dd>
+    </dl>
+    {pub.note && <p class="note">{pub.note}</p>}
+  </div>
+</article>
+
+<style>
+  .pub { display: grid; gap: var(--space-8); grid-template-columns: 1fr; align-items: start; }
+  @media (min-width: 40rem) { .pub { grid-template-columns: minmax(10rem, 16rem) 1fr; } .pub--compact { grid-template-columns: 9rem 1fr; } }
+  .pub__cover img { width: 100%; height: auto; border: 1px solid var(--line); box-shadow: 6px 8px 0 rgb(139 118 91 / 0.25); }
+  .pub__cover { max-width: 16rem; }
+  .pub h3 { font-size: 1.6rem; }
+  .pub__subtitle { font-family: var(--font-display); font-style: italic; font-size: 1.1rem; }
+</style>

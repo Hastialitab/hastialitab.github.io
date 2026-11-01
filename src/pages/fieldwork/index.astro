@@ -1,0 +1,22 @@
+---
+import { getCollection } from 'astro:content';
+import PageLayout from '../../layouts/PageLayout.astro';
+import FieldworkCard from '../../components/FieldworkCard.astro';
+import Icon from '../../components/Icon.astro';
+import { url } from '../../lib/url';
+const entries = (await getCollection('fieldwork')).sort((a, b) => a.data.order - b.data.order);
+---
+<PageLayout title="Fieldwork" description="Portfolio of archaeological and geophysical missions in Iran in which Hasti Alitab took part, 2022–2024." intro="Archaeological missions, field experience and site documentation, 2022–2024." seed={4}>
+  <section class="section">
+    <div class="container">
+      <p class="note">Site images are placeholders until suitably licensed or personal photographs are added. Images are always labelled as personal, documentary or illustrative.</p>
+      <h2 class="sr-only">Missions</h2>
+      <div class="grid grid--3" style="margin-top:var(--space-8)">
+        {entries.map((e, i) => (
+          <FieldworkCard slug={e.id} site={e.data.site} location={e.data.location} region={e.data.region} year={e.data.year} mission={e.data.mission} index={i} />
+        ))}
+      </div>
+      <p style="margin-top:var(--space-12)"><a class="btn btn--primary" href={url('/fieldwork/atlas/')}>Open the Interactive Fieldwork Atlas <Icon name="arrowRight" /></a></p>
+    </div>
+  </section>
+</PageLayout>

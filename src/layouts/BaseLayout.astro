@@ -1,0 +1,56 @@
+---
+import '../styles/global.css';
+// Latin-only WebFont files (the site is English). Self-hosted, no third-party requests.
+import playfair from '@fontsource-variable/playfair-display/files/playfair-display-latin-wght-normal.woff2?url';
+import playfairItalic from '@fontsource-variable/playfair-display/files/playfair-display-latin-wght-italic.woff2?url';
+import inter from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import plex400 from '@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-400-normal.woff2?url';
+import plex500 from '@fontsource/ibm-plex-sans/files/ibm-plex-sans-latin-500-normal.woff2?url';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site';
+import { url } from '../lib/url';
+
+interface Props { title?: string; description?: string; ogImage?: string; ogType?: string }
+const { title, description = site.description, ogImage = '/images/portrait/hasti-portrait.jpg', ogType = 'website' } = Astro.props;
+const fullTitle = title ? `${title} | ${site.name}` : site.title;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogUrl = new URL(url(ogImage), Astro.site);
+const fontFaces = `
+@font-face{font-family:'Playfair Display Variable';font-style:normal;font-display:swap;font-weight:400 900;src:url(${playfair}) format('woff2-variations')}
+@font-face{font-family:'Playfair Display Variable';font-style:italic;font-display:swap;font-weight:400 900;src:url(${playfairItalic}) format('woff2-variations')}
+@font-face{font-family:'Inter Variable';font-style:normal;font-display:swap;font-weight:100 900;src:url(${inter}) format('woff2-variations')}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-display:swap;font-weight:400;src:url(${plex400}) format('woff2')}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-display:swap;font-weight:500;src:url(${plex500}) format('woff2')}`;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <link rel="preload" href={playfair} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={inter} as="font" type="font/woff2" crossorigin />
+    <style set:html={fontFaces}></style>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#eae4d8" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href={url('/favicon.svg')} />
+    <link rel="sitemap" href={url('/sitemap-index.xml')} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:locale" content="en_GB" />
+    <meta name="twitter:card" content="summary" />
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Navbar />
+    <main id="main"><slot /></main>
+    <Footer />
+  </body>
+</html>

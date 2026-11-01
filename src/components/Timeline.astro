@@ -1,0 +1,14 @@
+---
+interface Item { period: string; title: string; place?: string; note?: string }
+interface Props { items: Item[] }
+const { items } = Astro.props;
+---
+<ol class="timeline">
+  {items.map((item) => (
+    <li>
+      <span class="timeline__period">{item.period}</span>
+      <h3 class="timeline__title">{item.title}</h3>
+      {(item.place || item.note) && <p class="timeline__text">{[item.place, item.note].filter(Boolean).join(' — ')}</p>}
+    </li>
+  ))}
+</ol>

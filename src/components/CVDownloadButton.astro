@@ -1,0 +1,10 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+import { url } from '../lib/url';
+interface Props { label?: string; variant?: 'primary' | 'ghost' }
+const { label = 'Download CV (PDF)', variant = 'primary' } = Astro.props;
+---
+<a class={`btn btn--${variant}`} href={url(site.cvPdf)} download>
+  <Icon name="download" /> {label}
+</a>

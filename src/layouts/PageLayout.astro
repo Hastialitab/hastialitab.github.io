@@ -1,0 +1,20 @@
+---
+// Inner-page layout: topographic banner + breadcrumbs, then page content.
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import TopoPattern from '../components/TopoPattern.astro';
+
+interface Props { title: string; description: string; heading?: string; intro?: string; crumbs?: { label: string; href?: string }[]; seed?: number }
+const { title, description, heading = title, intro, crumbs = [{ label: title }], seed = 0 } = Astro.props;
+---
+<BaseLayout title={title} description={description}>
+  <section class="banner">
+    <TopoPattern seed={seed} />
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+      <h1>{heading}</h1>
+      {intro && <p>{intro}</p>}
+    </div>
+  </section>
+  <slot />
+</BaseLayout>

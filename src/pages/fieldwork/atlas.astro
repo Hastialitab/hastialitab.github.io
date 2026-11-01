@@ -1,0 +1,34 @@
+---
+import { getCollection } from 'astro:content';
+import PageLayout from '../../layouts/PageLayout.astro';
+import InteractiveMap from '../../components/InteractiveMap.astro';
+import { url } from '../../lib/url';
+const entries = (await getCollection('fieldwork')).sort((a, b) => a.data.order - b.data.order);
+const sites = entries
+  .filter((f) => f.data.coordinates)
+  .map((f) => ({ slug: f.id, site: f.data.site, location: f.data.location, region: f.data.region, year: f.data.year, lat: f.data.coordinates!.lat, lng: f.data.coordinates!.lng }));
+const pending = entries.filter((f) => !f.data.coordinates);
+---
+<PageLayout title="Fieldwork Atlas" description="Interactive map of Iran showing the archaeological and geophysical missions Hasti Alitab took part in, 2022–2024." intro="A spatial overview of documented archaeological missions across Iran." crumbs={[{ label: 'Fieldwork', href: '/fieldwork/' }, { label: 'Atlas' }]} seed={5}>
+  <section class="section">
+    <div class="container">
+      <InteractiveMap sites={sites} height="min(70vh, 38rem)" />
+      <h2 style="margin-top:var(--space-12);font-size:1.5rem">Sites in the atlas</h2>
+      <ul class="site-list">
+        {entries.map((e) => (
+          <li>
+            <a href={url(`/fieldwork/${e.id}/`)}>{e.data.site}</a>
+            <span class="data-label">{e.data.year} · {e.data.location}, {e.data.region}{e.data.coordinates ? '' : ' · location pending'}</span>
+          </li>
+        ))}
+      </ul>
+      {pending.length > 0 && <p class="note">Sites without verified coordinates are listed but not plotted.</p>}
+      <p class="note">Basemap: Esri World Terrain. Coordinates are deliberately generalised to protect archaeological sites.</p>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .site-list { list-style: none; padding: 0; margin: 0 0 var(--space-6); }
+  .site-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-2) var(--space-6); padding: var(--space-3) 0; border-bottom: 1px solid var(--line); }
+</style>

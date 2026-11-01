@@ -1,0 +1,35 @@
+---
+import { nav, site } from '../data/site';
+import { url } from '../lib/url';
+---
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div>
+      <p class="site-footer__name">{site.name}</p>
+      <p class="data-label">{site.tagline}</p>
+      <p><a href={`mailto:${site.email}`}>{site.email}</a></p>
+    </div>
+    <nav aria-label="Footer">
+      <ul>
+        {nav.slice(1).map((item) => <li><a href={url(item.href)}>{item.label}</a></li>)}
+        <li><a href={url('/fieldwork/atlas/')}>Fieldwork Atlas</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="container site-footer__legal">
+    <p>© {new Date().getFullYear()} Hasti Alitab. Illustrative imagery is labelled as such and does not document personal fieldwork.</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer { background: var(--slate); color: var(--white); padding-top: var(--space-12); margin-top: var(--space-16); }
+  .site-footer a { color: var(--limestone); }
+  .site-footer a:hover { color: var(--white); }
+  .site-footer__inner { display: grid; gap: var(--space-8); grid-template-columns: 1fr; }
+  @media (min-width: 40rem) { .site-footer__inner { grid-template-columns: 1.4fr 1fr; } }
+  .site-footer__name { font-family: var(--font-display); font-size: 1.5rem; margin: 0; }
+  .site-footer .data-label { color: var(--sand); }
+  ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); }
+  .site-footer__legal { border-top: 1px solid rgb(248 246 240 / 0.2); margin-top: var(--space-8); padding-block: var(--space-6); font-size: 0.82rem; color: var(--sand); }
+  .site-footer__legal p { margin: 0; }
+</style>

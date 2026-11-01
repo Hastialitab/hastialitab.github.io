@@ -1,0 +1,34 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import Timeline from '../components/Timeline.astro';
+import { teachingPost, courses, professionalActivities } from '../data/teaching';
+---
+<PageLayout title="Teaching" description="Teaching assistant courses at Shahid Beheshti University and writing and storytelling teaching experience of Hasti Alitab." intro="Teaching experience and academic activities." seed={5}>
+  <section class="section">
+    <div class="container">
+      <SectionHeading eyebrow={teachingPost.period} title={teachingPost.role} lead={teachingPost.institution} />
+      <ul class="courses">
+        {courses.map((c) => (
+          <li>
+            <h3>{c.title}</h3>
+            <p class="data-label">With {c.instructor}</p>
+            <p>{c.audience}.</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+  <section class="section section--tint">
+    <div class="container">
+      <SectionHeading eyebrow="Professional activities" title="Writing, editing and storytelling" lead="Writing and teaching experience outside the archaeology classroom." />
+      <Timeline items={professionalActivities.map((a) => ({ period: a.period, title: a.title, note: a.text }))} />
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .courses { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-6); grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); }
+  .courses li { border-top: 2px solid var(--olive); padding-top: var(--space-4); }
+  .courses h3 { font-size: 1.2rem; }
+</style>

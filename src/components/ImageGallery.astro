@@ -1,0 +1,35 @@
+---
+import ImagePlaceholder from './ImagePlaceholder.astro';
+import { url } from '../lib/url';
+// `kind` keeps personal fieldwork photographs clearly separate from documentary or illustrative images.
+interface Image { src: string; alt: string; caption?: string; credit: string; kind: 'personal' | 'documentary' | 'illustrative' }
+interface Props { images: Image[]; emptyLabel?: string }
+const { images, emptyLabel = 'Photographs pending' } = Astro.props;
+const kindLabel = { personal: 'Personal fieldwork photograph', documentary: 'Documentary photograph (not by Hasti Alitab)', illustrative: 'Illustrative image' };
+---
+{images.length === 0 ? (
+  <div class="gallery gallery--empty">
+    <ImagePlaceholder label={emptyLabel} ratio="3 / 2" tone="sand" seed={1} />
+    <ImagePlaceholder label={emptyLabel} ratio="3 / 2" tone="olive" seed={2} />
+    <ImagePlaceholder label={emptyLabel} ratio="3 / 2" tone="slate" seed={3} />
+  </div>
+) : (
+  <ul class="gallery">
+    {images.map((img) => (
+      <li>
+        <figure>
+          <a href={url(img.src)}><img src={url(img.src)} alt={img.alt} loading="lazy" decoding="async" /></a>
+          <figcaption>
+            {img.caption && <>{img.caption}<br /></>}
+            <strong>{kindLabel[img.kind]}.</strong> {img.credit}
+          </figcaption>
+        </figure>
+      </li>
+    ))}
+  </ul>
+)}
+
+<style>
+  .gallery { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr)); }
+  .gallery img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; border: 1px solid var(--line); }
+</style>

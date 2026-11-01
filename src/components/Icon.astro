@@ -1,0 +1,24 @@
+---
+// Renders a Lucide icon from lucide-static as inline SVG (zero client JS).
+import menu from 'lucide-static/icons/menu.svg?raw';
+import x from 'lucide-static/icons/x.svg?raw';
+import arrowRight from 'lucide-static/icons/arrow-right.svg?raw';
+import download from 'lucide-static/icons/download.svg?raw';
+import mail from 'lucide-static/icons/mail.svg?raw';
+import mapPin from 'lucide-static/icons/map-pin.svg?raw';
+import layers from 'lucide-static/icons/layers.svg?raw';
+import mountain from 'lucide-static/icons/mountain.svg?raw';
+import waves from 'lucide-static/icons/waves.svg?raw';
+import users from 'lucide-static/icons/users.svg?raw';
+import chevronDown from 'lucide-static/icons/chevron-down.svg?raw';
+
+const icons = { menu, x, arrowRight, download, mail, mapPin, layers, mountain, waves, users, chevronDown };
+interface Props { name: keyof typeof icons; class?: string }
+const { name, class: cls = '' } = Astro.props;
+const svg = icons[name]
+  .replace(/ class="[^"]*"/, '')
+  .replace('<svg', `<svg class="icon ${cls}" aria-hidden="true" focusable="false"`)
+  .replace(/ width="\d+"/, '')
+  .replace(/ height="\d+"/, '');
+---
+<Fragment set:html={svg} />

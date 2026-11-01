@@ -1,0 +1,74 @@
+---
+import { nav, site } from '../data/site';
+import { url } from '../lib/url';
+import Icon from './Icon.astro';
+const path = Astro.url.pathname.replace(url('/').replace(/\/$/, ''), '') || '/';
+const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+<header class="site-header">
+  <div class="container site-header__bar">
+    <a class="brand" href={url('/')}>
+      <svg viewBox="0 0 64 32" class="brand__mark" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.2">
+        <path d="M2 28 C14 6 24 4 32 12 C40 4 52 8 62 28" />
+        <path d="M10 28 C18 14 26 12 32 18 C38 12 48 16 54 28" />
+        <path d="M18 28 C24 22 28 22 32 25 C36 22 42 23 46 28" />
+      </svg>
+      <span><span class="brand__name">{site.name}</span><span class="brand__sub">Landscape Archaeology</span></span>
+    </a>
+
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav" aria-label="Menu">
+      <span class="menu-toggle__open"><Icon name="menu" /></span>
+      <span class="menu-toggle__close"><Icon name="x" /></span>
+    </button>
+
+    <nav id="primary-nav" class="primary-nav" aria-label="Primary">
+      <ul>
+        {nav.map((item) => (
+          <li>
+            <a href={url(item.href)} aria-current={isActive(item.href) ? 'page' : undefined}>{item.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header { position: sticky; top: 0; z-index: 50; background: rgb(234 228 216 / 0.96); border-bottom: 1px solid var(--line); backdrop-filter: blur(6px); }
+  .site-header__bar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-6); min-height: 4.25rem; }
+  .brand { display: flex; align-items: center; gap: var(--space-3); color: var(--slate); text-decoration: none; }
+  .brand__mark { width: 3rem; color: var(--earth); }
+  .brand__name { display: block; font-family: var(--font-display); font-size: 1.2rem; line-height: 1.1; }
+  .brand__sub { display: block; font-family: var(--font-data); font-size: 0.7rem; letter-spacing: 0.08em; color: var(--earth-text); }
+  .primary-nav ul { display: flex; gap: clamp(0.9rem, 2vw, 1.75rem); list-style: none; margin: 0; padding: 0; }
+  .primary-nav a { font-family: var(--font-display); font-size: 0.98rem; color: var(--slate); text-decoration: none; padding: 0.4rem 0; border-bottom: 1px solid transparent; }
+  .primary-nav a:hover, .primary-nav a[aria-current='page'] { border-bottom-color: var(--slate); }
+  .menu-toggle { display: none; background: none; border: 1px solid var(--line-strong); color: var(--slate); padding: 0.5rem; cursor: pointer; border-radius: var(--radius); }
+  .menu-toggle__close { display: none; }
+  .menu-toggle[aria-expanded='true'] .menu-toggle__open { display: none; }
+  .menu-toggle[aria-expanded='true'] .menu-toggle__close { display: inline; }
+
+  @media (max-width: 62rem) {
+    .menu-toggle { display: inline-flex; }
+    .primary-nav { position: absolute; left: 0; right: 0; top: 100%; background: var(--limestone); border-bottom: 1px solid var(--line); display: none; }
+    .primary-nav.is-open { display: block; }
+    .primary-nav ul { flex-direction: column; gap: 0; padding: var(--space-2) var(--gutter) var(--space-6); }
+    .primary-nav a { display: block; padding: 0.85rem 0; font-size: 1.15rem; border-bottom: 1px solid var(--line); }
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
+  const nav = document.getElementById('primary-nav');
+  const setOpen = (open: boolean) => {
+    toggle?.setAttribute('aria-expanded', String(open));
+    nav?.classList.toggle('is-open', open);
+  };
+  toggle?.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && toggle?.getAttribute('aria-expanded') === 'true') {
+      setOpen(false);
+      toggle.focus();
+    }
+  });
+</script>

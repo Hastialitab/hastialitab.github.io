@@ -1,0 +1,69 @@
+---
+import { getCollection } from 'astro:content';
+import PageLayout from '../layouts/PageLayout.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import Timeline from '../components/Timeline.astro';
+import SkillGroup from '../components/SkillGroup.astro';
+import CVDownloadButton from '../components/CVDownloadButton.astro';
+import { profile, education, training, skillGroups, languages } from '../data/cv';
+import { courses } from '../data/teaching';
+import { publications } from '../data/publications';
+const fieldwork = (await getCollection('fieldwork')).sort((a, b) => b.data.year - a.data.year || a.data.order - b.data.order);
+---
+<PageLayout title="Academic CV" heading="Curriculum Vitae" description="Academic CV of Hasti Alitab: education, training, fieldwork, teaching, publications, skills and languages." intro="Public academic version." seed={3}>
+  <section class="section">
+    <div class="container">
+      <div class="no-print" style="margin-bottom:var(--space-8)"><CVDownloadButton label="Download Academic CV (PDF)" /></div>
+      <SectionHeading eyebrow="Profile" title="Academic profile" />
+      <p class="lead">{profile}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container two-col two-col--even">
+      <div><SectionHeading title="Education" /><Timeline items={education} /></div>
+      <div>
+        <SectionHeading title="Fieldwork" />
+        <Timeline items={fieldwork.map((f) => ({ period: String(f.data.year), title: `${f.data.site}, ${f.data.location}`, note: `${f.data.mission}. ${f.data.role}. Dir. ${f.data.directors}.` }))} />
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeading title="Training" />
+      <ul class="training">{training.map((t) => <li><span class="data-label">{t.year}</span><span>{t.text}</span></li>)}</ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container two-col two-col--even">
+      <div>
+        <SectionHeading title="Teaching" />
+        <p>Teaching Assistant, Department of Archaeology, Shahid Beheshti University (2024–present):</p>
+        <ul>{courses.map((c) => <li>{c.title}</li>)}</ul>
+      </div>
+      <div>
+        <SectionHeading title="Publications" />
+        {publications.map((p) => (
+          <p class="cite">{p.authors} ({p.year}). <em>{p.title}: {p.subtitle}.</em> {p.place}: {p.publisher}. {p.pages} ISBN {p.isbn}.</p>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeading title="Skills" />
+      <div class="grid grid--3">{skillGroups.map((g) => <SkillGroup title={g.title} items={g.items} />)}</div>
+      <h3 style="margin-top:var(--space-12)">Languages</h3>
+      <ul class="tags">{languages.map((l) => <li>{l.name} — {l.level}</li>)}</ul>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .training { list-style: none; padding: 0; margin: 0; }
+  .training li { display: grid; grid-template-columns: 6rem 1fr; gap: var(--space-4); padding: var(--space-2) 0; border-bottom: 1px solid var(--line); font-size: 0.95rem; }
+  .cite { font-size: 0.95rem; }
+</style>

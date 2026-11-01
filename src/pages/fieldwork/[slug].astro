@@ -1,0 +1,48 @@
+---
+import { getCollection, render } from 'astro:content';
+import PageLayout from '../../layouts/PageLayout.astro';
+import ImageGallery from '../../components/ImageGallery.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import { url } from '../../lib/url';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('fieldwork');
+  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+const { entry } = Astro.props;
+const { data } = entry;
+const { Content } = await render(entry);
+---
+<PageLayout
+  title={`${data.site}, ${data.year}`}
+  heading={data.site}
+  description={`${data.mission} at ${data.site}, ${data.location}, ${data.region} (${data.year}). ${data.summary}`}
+  intro={`${data.location}, ${data.region} · ${data.year}`}
+  crumbs={[{ label: 'Fieldwork', href: '/fieldwork/' }, { label: data.site }]}
+  seed={data.order}
+>
+  <section class="section">
+    <div class="container two-col">
+      <div>
+        <SectionHeading eyebrow="Mission" title={data.mission} />
+        <Content />
+        <p class="note">Listed roles and directors are taken from the academic CV.</p>
+      </div>
+      <dl class="meta-list" aria-label="Mission details">
+        <dt>Site</dt><dd>{data.site}</dd>
+        <dt>Location</dt><dd>{data.location}, {data.region}</dd>
+        <dt>Year</dt><dd>{data.year}</dd>
+        <dt>Role</dt><dd>{data.role}</dd>
+        <dt>Direction</dt><dd>{data.directors}</dd>
+        {data.coordinates ? <><dt>Map</dt><dd><a href={url('/fieldwork/atlas/')}>Show in the Atlas</a><br /><span class="data-label">{data.coordinates.precision}</span></dd></> : <><dt>Map</dt><dd>Location pending</dd></>}
+      </dl>
+    </div>
+  </section>
+  <section class="section section--tint">
+    <div class="container">
+      <SectionHeading eyebrow="Gallery" title="Images" />
+      <ImageGallery images={data.gallery} emptyLabel="Photographs pending" />
+      <p class="data-label" style="margin-top:var(--space-4)">No photographs are shown yet. Placeholders are not images of this site.</p>
+    </div>
+  </section>
+</PageLayout>

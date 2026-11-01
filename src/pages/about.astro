@@ -1,0 +1,55 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import Picture from '../components/Picture.astro';
+import Timeline from '../components/Timeline.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import { education, experience } from '../data/cv';
+import { courses } from '../data/teaching';
+import { url } from '../lib/url';
+---
+<PageLayout title="About" description="Academic biography, education, research interests and experience of Hasti Alitab, archaeologist and MA researcher in Landscape Archaeology." intro="Academic background, research vision and professional profile." seed={3}>
+  <section class="section">
+    <div class="container two-col">
+      <div>
+        <SectionHeading eyebrow="Biography" title="Archaeologist and MA researcher" />
+        <p class="lead">I am an archaeology student and MA researcher specialising in Landscape Archaeology, with a focus on human–environment interactions and archaeological landscapes.</p>
+        <p>My current research examines settlements and environmental change in the Sistan Plain, Iran, using archaeological, geomorphological, hydrological and remote-sensing data.</p>
+        <p>My interests include archaeology, landscape studies, GIS, remote sensing and spatial analysis. I have experience in fieldwork, academic editing and publishing, and in teaching archaeological software and remote-sensing methods.</p>
+      </div>
+      <figure>
+        <Picture src="/images/portrait/hasti-portrait.jpg" alt="Hasti Alitab looking upward in front of a weathered brick wall" width={640} height={640} widths={[400, 640]} sizes="(min-width: 52rem) 28rem, 100vw" style="width:100%;height:auto;border:1px solid var(--line)" />
+        <figcaption>Portrait of Hasti Alitab.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section section--tint">
+    <div class="container two-col two-col--even">
+      <div>
+        <SectionHeading eyebrow="Education" title="Education" />
+        <Timeline items={education} />
+      </div>
+      <div>
+        <SectionHeading eyebrow="Interests" title="Research interests" />
+        <ul class="tags">
+          {['Landscape archaeology', 'Archaeological landscapes', 'Human–environment interactions', 'GIS', 'Remote sensing', 'Spatial analysis', 'Geomorphology', 'Hydrology', 'Archaeology of Iran'].map((t) => <li>{t}</li>)}
+        </ul>
+        <p style="margin-top:var(--space-6)"><a class="text-link" href={url('/research/')}>Research themes →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container two-col two-col--even">
+      <div>
+        <SectionHeading eyebrow="Experience" title="Academic and professional experience" />
+        <Timeline items={experience} />
+      </div>
+      <div>
+        <SectionHeading eyebrow="Academic activities" title="Teaching assistant courses" />
+        <ul>{courses.map((c) => <li>{c.title}</li>)}</ul>
+        <p><a class="text-link" href={url('/teaching/')}>Teaching →</a> &nbsp; <a class="text-link" href={url('/fieldwork/')}>Fieldwork →</a></p>
+      </div>
+    </div>
+  </section>
+</PageLayout>

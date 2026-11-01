@@ -1,0 +1,22 @@
+---
+import ImagePlaceholder from './ImagePlaceholder.astro';
+import { url } from '../lib/url';
+interface Props { slug: string; site: string; location: string; region: string; year: number; mission: string; index?: number }
+const { slug, site, location, region, year, mission, index = 0 } = Astro.props;
+const tones = ['sand', 'olive', 'slate'] as const;
+---
+<article class="card fw-card">
+  <ImagePlaceholder label="Site photograph pending" ratio="3 / 2" tone={tones[index % 3]} seed={index + 2} />
+  <div class="card__body">
+    <p class="data-label">{year} · {mission.split(' — ')[0]}</p>
+    <h3><a href={url(`/fieldwork/${slug}/`)}>{site}</a></h3>
+    <p>{location}, {region}</p>
+  </div>
+</article>
+
+<style>
+  .fw-card h3 a { color: var(--slate); text-decoration: none; }
+  .fw-card h3 a::after { content: ''; position: absolute; inset: 0; }
+  .fw-card { position: relative; transition: border-color 0.2s; }
+  .fw-card:hover { border-color: var(--olive); }
+</style>

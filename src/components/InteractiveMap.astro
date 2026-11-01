@@ -1,0 +1,165 @@
+---
+// Interactive Fieldwork Atlas (Leaflet). Markers use area-level coordinates only.
+interface Site { slug: string; site: string; location: string; region: string; year: number; lat: number; lng: number }
+interface Props { sites: Site[]; height?: string; id?: string }
+const { sites, height = '34rem', id = 'atlas-map' } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<div class="atlas">
+  <div
+    id={id}
+    class="atlas__map"
+    style={`height:${height}`}
+    role="region"
+    aria-label="Interactive map of Iran showing archaeological mission locations"
+    data-sites={JSON.stringify(sites)}
+    data-base={base}
+  >
+    <div class="atlas__start">
+      <p class="data-label" data-status>Interactive map of Iran — loads when scrolled into view.</p>
+      <button type="button" class="btn btn--primary atlas__load" hidden>Load interactive map</button>
+    </div>
+    <noscript><p class="note">The interactive map needs JavaScript. All sites are listed below the map.</p></noscript>
+  </div>
+  <p class="atlas__note data-label">
+    Marker positions are approximate, area-level locations (rounded to 0.1°) — not excavation or survey coordinates.
+  </p>
+</div>
+
+<style is:global>
+  .atlas__start { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-4); text-align: center; padding: var(--space-6); background: repeating-linear-gradient(135deg, #d8cdb6 0 12px, #d2c6ad 12px 13px); }
+  .atlas__start p { margin: 0; }
+  .atlas__load[hidden] { display: none; }
+  .atlas__map { width: 100%; background: #d8cdb6; border: 1px solid var(--line-strong); z-index: 0; }
+  .atlas__map .leaflet-tile-pane { filter: sepia(0.55) saturate(0.8) contrast(0.95) brightness(1.02); }
+  .atlas__map .leaflet-container { font-family: var(--font-body); }
+  .atlas__note { margin: var(--space-2) 0 0; }
+  .atlas-marker { background: var(--olive); border: 3px solid var(--white); border-radius: 50%; box-shadow: 0 0 0 1px var(--slate), 0 2px 6px rgb(0 0 0 / 0.35); transition: transform 0.15s; }
+  .atlas-marker:hover, .atlas-marker:focus-visible { transform: scale(1.2); background: var(--slate); }
+  .atlas-marker--multi { background: var(--earth); }
+  .atlas__map .leaflet-popup-content-wrapper { background: var(--white); color: var(--slate); border-radius: 2px; border: 1px solid var(--line-strong); }
+  .atlas__map .leaflet-popup-tip { background: var(--white); }
+  .atlas-popup { min-width: 11rem; }
+  .atlas-popup h3 { font-size: 1.05rem; margin: 0 0 0.15rem; }
+  .atlas-popup p { margin: 0 0 0.35rem; font-size: 0.85rem; line-height: 1.4; }
+  .atlas-popup .data-label { font-size: 0.72rem; }
+  .atlas-popup a { font-weight: 500; font-size: 0.85rem; }
+  .atlas-popup hr { border: 0; border-top: 1px solid var(--line); margin: 0.5rem 0; }
+  .atlas-label { background: var(--white); border: 1px solid var(--line-strong); border-radius: 2px; color: var(--slate); font-family: var(--font-data); font-size: 0.72rem; padding: 1px 6px; box-shadow: none; }
+  .atlas-label::before { display: none; }
+</style>
+
+<script>
+  import type * as Leaflet from 'leaflet';
+
+  type Site = { slug: string; site: string; location: string; region: string; year: number; lat: number; lng: number };
+
+  // Leaflet (~150 KB) and its map tiles are fetched only when the map is near the viewport,
+  // or on request when the visitor has Data Saver on or a slow connection.
+  async function init(el: HTMLElement) {
+    if (el.dataset.ready) return;
+    el.dataset.ready = 'true';
+    const status = el.querySelector<HTMLElement>('[data-status]');
+    if (status) status.textContent = 'Loading map…';
+    el.querySelector<HTMLElement>('.atlas__load')?.setAttribute('hidden', '');
+
+    let L: typeof Leaflet;
+    try {
+      const { default: cssUrl } = await import('leaflet/dist/leaflet.css?url');
+      if (!document.querySelector('link[data-leaflet-css]')) {
+        const link = Object.assign(document.createElement('link'), { rel: 'stylesheet', href: cssUrl });
+        link.dataset.leafletCss = '';
+        document.head.appendChild(link);
+      }
+      L = (await import('leaflet')).default as unknown as typeof Leaflet;
+    } catch {
+      el.dataset.ready = '';
+      if (status) status.textContent = 'The map could not be loaded. Please check your connection; the site list below has the same information.';
+      const btn = el.querySelector<HTMLElement>('.atlas__load');
+      if (btn) { btn.textContent = 'Try again'; btn.removeAttribute('hidden'); }
+      return;
+    }
+
+    const sites: Site[] = JSON.parse(el.dataset.sites ?? '[]');
+    const base = el.dataset.base ?? '';
+    el.replaceChildren();
+    const map = L.map(el, {
+      center: [32.5, 54.5],
+      zoom: 5,
+      minZoom: 4,
+      maxZoom: 12,
+      maxBounds: [[20, 38], [44, 70]],
+      scrollWheelZoom: false, // keeps page scrolling usable on touch and trackpads
+    });
+
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}', {
+      maxNativeZoom: 13,
+      attribution: 'Tiles © Esri — Source: USGS, Esri, TANA, DeLorme, and NGA',
+    }).addTo(map);
+    L.control.scale({ metric: true, imperial: false }).addTo(map);
+
+    // Sites that share an area (e.g. two missions in Rey) are grouped into one marker.
+    const groups = new Map<string, Site[]>();
+    sites.forEach((s) => {
+      const key = `${s.lat},${s.lng}`;
+      groups.set(key, [...(groups.get(key) ?? []), s]);
+    });
+
+    const bounds: Leaflet.LatLngTuple[] = [];
+    groups.forEach((group) => {
+      const { lat, lng } = group[0];
+      const names = group.map((g) => g.site).join(' & ');
+      const icon = L.divIcon({
+        className: `atlas-marker${group.length > 1 ? ' atlas-marker--multi' : ''}`,
+        iconSize: [18, 18],
+        iconAnchor: [9, 9],
+        popupAnchor: [0, -10],
+      });
+      const marker = L.marker([lat, lng], { icon, title: names, alt: names, keyboard: true }).addTo(map);
+      marker.bindTooltip(names, { permanent: map.getSize().x > 640, direction: 'right', offset: [10, 0], className: 'atlas-label' });
+
+      const card = document.createElement('div');
+      card.className = 'atlas-popup';
+      group.forEach((s, i) => {
+        if (i > 0) card.appendChild(document.createElement('hr'));
+        const h = document.createElement('h3');
+        h.textContent = s.site;
+        const meta = document.createElement('p');
+        meta.className = 'data-label';
+        meta.textContent = `${s.year} · ${s.location}, ${s.region}`;
+        const a = document.createElement('a');
+        a.href = `${base}/fieldwork/${s.slug}/`;
+        a.textContent = 'View fieldwork entry →';
+        card.append(h, meta, a);
+      });
+      marker.bindPopup(card);
+      bounds.push([lat, lng]);
+    });
+
+    if (bounds.length > 1) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 6 });
+
+    // Enable wheel zoom only after the user interacts with the map.
+    map.once('focus click', () => map.scrollWheelZoom.enable());
+  }
+
+  const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+  const constrained = !!conn && (conn.saveData === true || /(^|-)2g$/.test(conn.effectiveType ?? ''));
+
+  document.querySelectorAll<HTMLElement>('.atlas__map[data-sites]').forEach((el) => {
+    const btn = el.querySelector<HTMLButtonElement>('.atlas__load');
+    btn?.addEventListener('click', () => init(el));
+    if (constrained || !('IntersectionObserver' in window)) {
+      if (btn) {
+        btn.hidden = false;
+        btn.textContent = 'Load interactive map (about 150 KB plus map tiles)';
+      }
+      const status = el.querySelector('[data-status]');
+      if (status) status.textContent = constrained ? 'Map not loaded automatically to save data.' : 'Interactive map of Iran.';
+      return;
+    }
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) { io.disconnect(); init(el); }
+    }, { rootMargin: '300px' });
+    io.observe(el);
+  });
+</script>

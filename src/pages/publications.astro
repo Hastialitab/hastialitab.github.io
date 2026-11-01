@@ -1,0 +1,30 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import PublicationCard from '../components/PublicationCard.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import { publications, publicationTypes } from '../data/publications';
+const groups = publicationTypes
+  .map((type) => ({ type, items: publications.filter((p) => p.type === type).sort((a, b) => b.year - a.year) }))
+  .filter((g) => g.items.length);
+---
+<PageLayout title="Publications" description="Publications by Hasti Alitab, including the 2026 Bibliography of Articles on Iranian Archaeology (Tehran: Nashr-e Tarikh-e Iran)." intro="Books and scholarly works." seed={2}>
+  <section class="section">
+    <div class="container">
+      {groups.map((g) => (
+        <div class="group">
+          <SectionHeading eyebrow={`${g.items.length} item${g.items.length > 1 ? 's' : ''}`} title={`${g.type}s`} />
+          {g.items.map((p) => <PublicationCard pub={p} />)}
+        </div>
+      ))}
+      <p class="note">Journal articles, book chapters and conference papers will appear here as they are published.</p>
+      <h2 class="cite-title">Citation</h2>
+      <p class="cite">Alitab, Hasti, &amp; Mohammadkhani, K. (2026). <em>Bibliography of Articles on Iranian Archaeology: A Bibliographic Index of Archaeological Articles Published in Iranian Journals, 1959–2025.</em> Tehran: Nashr-e Tarikh-e Iran. 635 pp. ISBN 978-622-4995-13-1. [Originally published in Persian.]</p>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .group { margin-bottom: var(--space-12); }
+  .cite-title { font-size: 1.3rem; margin-top: var(--space-12); }
+  .cite { font-family: var(--font-data); font-size: 0.92rem; border-left: 3px solid var(--sand); padding-left: var(--space-4); }
+</style>

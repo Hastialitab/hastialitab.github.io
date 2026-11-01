@@ -1,0 +1,38 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import ImagePlaceholder from '../components/ImagePlaceholder.astro';
+import { researchThemes } from '../data/research';
+import { url } from '../lib/url';
+const tones = ['olive', 'sand', 'slate'] as const;
+---
+<PageLayout title="Research" description="Research themes of Hasti Alitab: archaeological landscapes of Sistan, digital archaeology and spatial analysis, and human–environment interactions." intro="Research interests and thematic focuses in archaeology, landscape studies and spatial analysis." seed={1}>
+  {researchThemes.map((t, i) => (
+    <section class="section" id={t.slug} class:list={{ 'section--tint': i % 2 === 1 }}>
+      <div class="container two-col two-col--even theme">
+        <div class:list={{ 'theme__media--first': i === 0 }}>
+          <ImagePlaceholder label={t.imageNote} ratio={i === 0 ? '4 / 3' : '16 / 10'} tone={tones[i % 3]} seed={i + 1} />
+          <p class="data-label" style="margin-top:var(--space-2)">Illustrative placeholder — not a photograph and not fieldwork documentation.</p>
+        </div>
+        <div>
+          <p class="eyebrow">Theme {i + 1}</p>
+          <h2>{t.title}</h2>
+          <p class="lead">{t.intro}</p>
+          <h3>Interests</h3>
+          <ul>{t.interests.map((x) => <li>{x}</li>)}</ul>
+          <h3>Methods and data</h3>
+          <ul class="tags">{t.methods.map((m) => <li>{m}</li>)}</ul>
+          <p class="note" style="margin-top:var(--space-6)">{t.status}</p>
+        </div>
+      </div>
+    </section>
+  ))}
+  <section class="section">
+    <div class="container">
+      <p class="lead">Related documented fieldwork — geophysical and archaeological missions in Iran — is presented in the <a href={url("/fieldwork/")}>Fieldwork portfolio</a>. None of it is Sistan fieldwork.</p>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  h3 { font-size: 1.05rem; margin-top: var(--space-6); }
+</style>

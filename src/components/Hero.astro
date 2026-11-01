@@ -1,0 +1,64 @@
+---
+import Icon from './Icon.astro';
+import TopoPattern from './TopoPattern.astro';
+import CVDownloadButton from './CVDownloadButton.astro';
+import { site } from '../data/site';
+import { url } from '../lib/url';
+// Optional real landscape photograph/satellite image. Leave undefined to show the illustrative terrain.
+interface Props { image?: { src: string; alt: string; credit: string } }
+const { image } = Astro.props;
+---
+<section class="hero">
+  <div class="hero__art" aria-hidden={image ? undefined : 'true'}>
+    {image ? (
+      <img src={url(image.src)} alt={image.alt} width="1600" height="900" fetchpriority="high" />
+    ) : (
+      <svg viewBox="0 0 1200 600" preserveAspectRatio="xMidYMax slice" role="presentation">
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#d9d0bd" />
+            <stop offset="1" stop-color="#eae4d8" />
+          </linearGradient>
+        </defs>
+        <rect width="1200" height="600" fill="url(#sky)" />
+        <path d="M0 330 L120 270 L210 300 L330 220 L450 290 L560 240 L700 310 L820 250 L960 300 L1100 240 L1200 290 V600 H0Z" fill="#a39b8a" opacity="0.55" />
+        <path d="M0 400 C150 360 300 380 450 350 S750 370 900 340 S1130 360 1200 350 V600 H0Z" fill="#b9a88d" />
+        <path d="M0 460 C200 430 380 470 600 440 S980 450 1200 430 V600 H0Z" fill="#9c8a6e" />
+        <path d="M0 520 C250 495 420 535 700 505 S1050 515 1200 500 V600 H0Z" fill="#8b765b" />
+        <path d="M-20 430 C200 470 350 400 600 450 S 1000 500 1220 440" fill="none" stroke="#68745c" stroke-width="3" opacity="0.7" />
+      </svg>
+    )}
+  </div>
+  <TopoPattern class="hero__topo" seed={1} />
+  <div class="hero__fade" aria-hidden="true"></div>
+
+  <div class="container hero__content">
+    <p class="eyebrow">Archaeologist &nbsp;·&nbsp; Spatial Researcher</p>
+    <h1>{site.name}</h1>
+    <p class="hero__subtitle">Landscape Archaeology &amp; Spatial Research</p>
+    <hr class="rule" />
+    <p class="hero__lead">Investigating the relationships between past human societies, environmental change, and archaeological landscapes.</p>
+    <div class="hero__actions">
+      <a class="btn btn--primary" href={url('/research/')}>Explore Research <Icon name="arrowRight" /></a>
+      <a class="btn btn--ghost" href={url('/fieldwork/')}>Fieldwork Portfolio</a>
+      <CVDownloadButton label="Download Academic CV" variant="ghost" />
+    </div>
+    <p class="hero__note data-label">
+      {image ? image.credit : 'Illustrative terrain graphic — not a photograph. Real landscape imagery to be added (see README).'}
+    </p>
+  </div>
+</section>
+
+<style>
+  .hero { position: relative; overflow: hidden; background: var(--limestone); min-height: min(42rem, 88vh); display: flex; align-items: center; border-bottom: 1px solid var(--line); }
+  .hero__art, .hero__art :global(svg), .hero__art :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .hero :global(.hero__topo) { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--earth); opacity: 0.25; pointer-events: none; }
+  .hero__fade { position: absolute; inset: 0; background: linear-gradient(90deg, rgb(234 228 216 / 0.96) 0%, rgb(234 228 216 / 0.8) 45%, rgb(234 228 216 / 0) 85%); }
+  @media (max-width: 48rem) { .hero__fade { background: linear-gradient(180deg, rgb(234 228 216 / 0.92), rgb(234 228 216 / 0.78)); } }
+  .hero__content { position: relative; padding-block: clamp(3.5rem, 9vw, 6rem); }
+  .hero h1 { font-size: clamp(3rem, 9vw, 5.5rem); margin-bottom: var(--space-2); }
+  .hero__subtitle { font-family: var(--font-display); font-style: italic; font-size: clamp(1.5rem, 3.6vw, 2.4rem); line-height: 1.2; margin: 0; max-width: 28rem; }
+  .hero__lead { max-width: 30rem; font-size: 1.15rem; }
+  .hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-6); }
+  .hero__note { margin-top: var(--space-8); max-width: 30rem; }
+</style>
