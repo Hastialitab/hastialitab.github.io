@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://hasti-alitab.github.io/sitemap-index.xml
